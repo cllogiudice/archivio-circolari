@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivio Circolari - I.C. "Balilla-Imbriani"</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --primary-hover: #004085;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-color: #d1d5db;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.9rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Status Temporale */
+        .status-box {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .status-box span {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Pannello Filtri */
+        .filters-panel {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            align-items: end;
+        }
+
+        @media (min-width: 768px) {
+            .filters-panel {
+                grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            }
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .filter-input, .filter-select {
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            background-color: #fff;
+            transition: border-color 0.2s;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .reset-btn {
+            padding: 10px 16px;
+            background-color: #e5e7eb;
+            color: #374151;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            height: 43px;
+        }
+
+        .reset-btn:hover {
+            background-color: #d1d5db;
+        }
+
+        /* Barra Paginatore */
+        .pagination-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 12px 18px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+        }
+
+        .results-info {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-btn {
+            padding: 6px 12px;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-indicator {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            padding: 0 5px;
+        }
+
+        /* Griglia e Animazione Card */
+        .grid {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-left: 4px solid var(--primary-color);
+            animation: fadeInUp 0.35s ease-out forwards;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        .card-title:hover {
+            text-decoration: underline;
+        }
+
+        .card-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #444444;
+            margin-bottom: 12px;
+        }
+
+        .card-link {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        .loader {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 50px;
+            font-weight: 500;
+        }
+
+        .error-msg {
+            text-align: center;
+            color: #d9534f;
+            background: #fdf7f7;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            border-top: 1px solid #e5e7eb;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer span {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Archivio Circolari</h1>
+        <p class="subtitle">Istituto Comprensivo "Balilla-Imbriani" - Bari</p>
+        <div class="status-box">
+            🕒 Ora attuale: <span id="clock">--:--:--</span> | 
+            🔄 Ultimo aggiornamento DB: <span id="lastUpdate">Caricamento...</span>
+        </div>
+    </header>
+
+    <!-- Filtri -->
+    <div class="filters-panel">
+        <div class="filter-group">
+            <label for="searchInput">Cerca per parola chiave</label>
+            <input type="text" id="searchInput" class="filter-input" placeholder="Es. GLO, STEM, Assemblea..." oninput="onFilterChange()">
+        </div>
+
+        <div class="filter-group">
+            <label for="yearSelect">Anno</label>
+            <select id="yearSelect" class="filter-select" onchange="onFilterChange()">
+                <option value="">Tutti gli anni</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="monthSelect">Mese</label>
+            <select id="monthSelect" class="filter-select" onchange="onFilterChange()">
+                <option value="">Tutti i mesi</option>
+                <option value="0">Gennaio</option>
+                <option value="1">Febbraio</option>
+                <option value="2">Marzo</option>
+                <option value="3">Aprile</option>
+                <option value="4">Maggio</option>
+                <option value="5">Giugno</option>
+                <option value="6">Luglio</option>
+                <option value="7">Agosto</option>
+                <option value="8">Settembre</option>
+                <option value="9">Ottobre</option>
+                <option value="10">Novembre</option>
+                <option value="11">Dicembre</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="sortSelect">Ordinamento</label>
+            <select id="sortSelect" class="filter-select" onchange="onFilterChange()">
+                <option value="desc">Dal più recente</option>
+                <option value="asc">Dal meno recente</option>
+            </select>
+        </div>
+
+        <button class="reset-btn" onclick="resetFilters()" title="Resetta tutti i filtri">🔄 Reset</button>
+    </div>
+
+    <!-- Paginatore Alto -->
+    <div class="pagination-bar">
+        <div class="results-info">
+            <span id="resultsCount">Caricamento in corso...</span>
+        </div>
+        <div class="pagination-controls">
+            <button class="page-btn" id="prevBtnTop" onclick="changePage(-1)">← Prec</button>
+            <span class="page-indicator" id="pageIndicatorTop">Pagina 1 di 1</span>
+            <button class="page-btn" id="nextBtnTop" onclick="changePage(1)">Succ →</button>
+        </div>
+    </div>
+
+    <div id="loader" class="loader">Caricamento archivio dal database in corso...</div>
+    
+    <div id="circolari-grid" class="grid"></div>
+
+    <!-- Paginatore Basso -->
+    <div class="pagination-bar" id="bottomPaginationBar" style="display: none;">
+        <div></div>
+        <div class="pagination-controls">
+            <button class="page-btn" id="prevBtnBottom" onclick="changePage(-1)">← Precedente</button>
+            <span class="page-indicator" id="pageIndicatorBottom">Pagina 1 di 1</span>
+            <button class="page-btn" id="nextBtnBottom" onclick="changePage(1)">Successiva →</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>Archivio digitale autonomo • Webmaster: <span>Claudio Lo Giudice</span></p>
+</footer>
+
+<script>
+let allCircolari = [];
+let filteredCircolari = [];
+let currentPage = 1;
+const itemsPerPage = 10;
+
+async function loadArchive() {
+    const loader = document.getElementById('loader');
+
+    try {
+        const response = await fetch('circolari.json');
+        if (!response.ok) throw new Error("File JSON non trovato.");
+        
+        allCircolari = await response.json();
+        loader.style.display = 'none';
+        
+        populateYearDropdown();
+        applyFilters();
+    } catch (error) {
+        loader.innerHTML = '<p class="error-msg">File circolari.json non trovato. Esegui lo script Python in locale per generarlo.</p>';
+    }
+}
+
+async function checkLastUpdate() {
+    // Orologio in tempo reale
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('clock').textContent = now.toLocaleTimeString('it-IT');
+    }, 1000);
+
+    // Ultimo aggiornamento del file JSON
+    try {
+        const response = await fetch('circolari.json', { method: 'HEAD' });
+        const lastModifiedHeader = response.headers.get('last-modified');
+        
+        if (lastModifiedHeader) {
+            const lastModDate = new Date(lastModifiedHeader);
+            document.getElementById('lastUpdate').textContent = lastModDate.toLocaleDateString('it-IT', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            }) + ' alle ' + lastModDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        } else {
+            document.getElementById('lastUpdate').textContent = "Disponibile";
+        }
+    } catch (e) {
+        document.getElementById('lastUpdate').textContent = "Aggiornato di recente";
+    }
+}
+
+function populateYearDropdown() {
+    const yearSelect = document.getElementById('yearSelect');
+    const years = new Set();
+
+    allCircolari.forEach(item => {
+        if (item.pubDate) {
+            const year = new Date(item.pubDate).getFullYear();
+            if (!isNaN(year)) years.add(year);
+        }
+    });
+
+    const sortedYears = Array.from(years).sort((a, b) => b - a);
+    sortedYears.forEach(year => {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelect.appendChild(option);
+    });
+}
+
+function onFilterChange() {
+    currentPage = 1;
+    applyFilters();
+}
+
+function applyFilters() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    const selectedYear = document.getElementById('yearSelect').value;
+    const selectedMonth = document.getElementById('monthSelect').value;
+    const sortOrder = document.getElementById('sortSelect').value;
+
+    filteredCircolari = allCircolari.filter(item => {
+        const date = item.pubDate ? new Date(item.pubDate) : null;
+        
+        const matchesQuery = !query || 
+            item.title.toLowerCase().includes(query) || 
+            item.description.toLowerCase().includes(query);
+
+        const matchesYear = !selectedYear || (date && date.getFullYear().toString() === selectedYear);
+        const matchesMonth = selectedMonth === "" || (date && date.getMonth().toString() === selectedMonth);
+
+        return matchesQuery && matchesYear && matchesMonth;
+    });
+
+    filteredCircolari.sort((a, b) => {
+        const dateA = a.pubDate ? new Date(a.pubDate) : new Date(0);
+        const dateB = b.pubDate ? new Date(b.pubDate) : new Date(0);
+
+        return sortOrder === 'asc' ? (dateA - dateB) : (dateB - dateA);
+    });
+
+    renderCurrentPage();
+}
+
+function renderCurrentPage() {
+    const container = document.getElementById('circolari-grid');
+    const countSpan = document.getElementById('resultsCount');
+    const bottomBar = document.getElementById('bottomPaginationBar');
+
+    const totalItems = filteredCircolari.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+    const pageItems = filteredCircolari.slice(startIndex, endIndex);
+
+    if (totalItems > 0) {
+        countSpan.textContent = `Mostrate ${startIndex + 1}-${endIndex} di ${totalItems} circolari`;
+        bottomBar.style.display = 'flex';
+    } else {
+        countSpan.textContent = `Trovate 0 circolari`;
+        bottomBar.style.display = 'none';
+    }
+
+    updatePaginationControls(totalPages);
+
+    if (pageItems.length === 0) {
+        container.innerHTML = '<p class="error-msg">Nessuna circolare corrisponde ai criteri di ricerca selezionati.</p>';
+        return;
+    }
+
+    container.innerHTML = pageItems.map(item => {
+        const date = item.pubDate ? new Date(item.pubDate) : null;
+        const dateFormatted = date ? date.toLocaleDateString('it-IT', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        }) : '';
+
+        return `
+            <article class="card">
+                <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="card-title">${item.title}</a>
+                <div class="card-meta">🗓️ ${dateFormatted}</div>
+                <div class="card-desc">${item.description}</div>
+                <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="card-link">Leggi circolare completa &rarr;</a>
+            </article>
+        `;
+    }).join('');
+}
+
+function updatePaginationControls(totalPages) {
+    const isPrevDisabled = currentPage === 1;
+    const isNextDisabled = currentPage === totalPages || totalPages === 0;
+    const textIndicator = `Pagina ${currentPage} di ${totalPages}`;
+
+    document.getElementById('prevBtnTop').disabled = isPrevDisabled;
+    document.getElementById('nextBtnTop').disabled = isNextDisabled;
+    document.getElementById('pageIndicatorTop').textContent = textIndicator;
+
+    document.getElementById('prevBtnBottom').disabled = isPrevDisabled;
+    document.getElementById('nextBtnBottom').disabled = isNextDisabled;
+    document.getElementById('pageIndicatorBottom').textContent = textIndicator;
+}
+
+function changePage(direction) {
+    currentPage += direction;
+    renderCurrentPage();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('yearSelect').value = '';
+    document.getElementById('monthSelect').value = '';
+    document.getElementById('sortSelect').value = 'desc';
+    currentPage = 1;
+    applyFilters();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadArchive();
+    checkLastUpdate();
+});
+</script>
+
+</body>
+</html>
