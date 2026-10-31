@@ -10,10 +10,16 @@ json_filename = "circolari.json"
 existing_links = set()
 all_circolari = []
 
+# Gestione della nuova struttura del JSON (che ora contiene un dizionario con metadati e lista)
 if os.path.exists(json_filename):
     try:
         with open(json_filename, "r", encoding="utf-8") as f:
-            all_circolari = json.load(f)
+            data = json.load(f)
+            # Compatibilità: se il file vecchio era una lista pura o un dizionario
+            if isinstance(data, list):
+                all_circolari = data
+            elif isinstance(data, dict):
+                all_circolari = data.get("circolari", [])
             existing_links = {c["link"] for c in all_circolari}
     except Exception:
         pass
@@ -63,7 +69,13 @@ all_circolari.sort(
     reverse=True
 )
 
+# Creazione del pacchetto dati con il timestamp aggiornato ad ogni esecuzione
+output_data = {
+    "ultimo_aggiornamento": datetime.now().strftime("%d %b %Y alle %H:%M"),
+    "circolari": all_circolari
+}
+
 with open(json_filename, "w", encoding="utf-8") as f:
-    json.dump(all_circolari, f, ensure_ascii=False, indent=4)
+    json.dump(output_data, f, ensure_ascii=False, indent=4)
 
 print(f"Completato! Totale circolari nel DB: {len(all_circolari)}")
